@@ -1,0 +1,17 @@
+extends layout
+
+block content
+
+  h1 Genre: #{genre.name}
+
+  div(style='margin-left:20px;margin-top:20px')
+
+    h4 Albums
+    if genre_albums.length
+      dl
+        each album in genre_albums
+          dt
+            a(href=album.url) #{album.title}
+          dd #{album.summary}
+    else
+      p This genre has no albums.

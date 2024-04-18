@@ -1,9 +1,13 @@
-const artist = require("../models/artist");
+const Artist = require("../models/artist");
 const asyncHandler = require("express-async-handler");
 
-// Display list of all artists.
+// Display list of all Authors.
 exports.artist_list = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: artist list");
+  const allArtists = await Artist.find().sort({ name: 1 }).exec();
+  res.render("artist_list", {
+    title: "Artist List",
+    artist_list: allArtists,
+  });
 });
 
 // Display detail page for a specific artist.

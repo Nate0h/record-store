@@ -1,0 +1,12 @@
+extends layout
+
+block content
+  h1= title
+
+  if artist_list.length
+    ul
+      each artist in artist_list
+        li
+          a(href=artist.url) #{artist.name}
+  else
+    p There are no artists.

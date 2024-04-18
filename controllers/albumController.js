@@ -1,13 +1,31 @@
-const album = require("../models/album");
+const Album = require("../models/album");
+const Artist = require("../models/artist");
+const Genre = require("../models/genre");
+
 const asyncHandler = require("express-async-handler");
 
 exports.index = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: Site Home Page");
+  const [numAlbums, numArtists, numGenres] = await Promise.all([
+    Album.countDocuments({}).exec(),
+    Artist.countDocuments({}).exec(),
+    Genre.countDocuments({}).exec(),
+  ]);
+
+  res.render("index", {
+    title: "Nate-O's Record Store",
+    album_count: numAlbums,
+    artist_count: numArtists,
+    genre_count: numGenres,
+  });
 });
 
-// Display list of all albums.
 exports.album_list = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: album list");
+  const allAlbums = await Album.find({}, "title artist")
+    .sort({ title: 1 })
+    .populate("artist")
+    .exec();
+
+  res.render("album_list", { title: "Album List", album_list: allAlbums });
 });
 
 // Display detail page for a specific album.
