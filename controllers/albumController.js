@@ -30,7 +30,23 @@ exports.album_list = asyncHandler(async (req, res, next) => {
 
 // Display detail page for a specific album.
 exports.album_detail = asyncHandler(async (req, res, next) => {
-  res.send(`NOT IMPLEMENTED: album detail: ${req.params.id}`);
+  // Get details of books, book instances for specific book
+  const album = await Album.findById(req.params.id)
+    .populate("artist")
+    .populate("genre")
+    .exec();
+
+  if (album === null) {
+    // No results.
+    const err = new Error("Album not found");
+    err.status = 404;
+    return next(err);
+  }
+
+  res.render("album_detail", {
+    title: album.title,
+    album: album,
+  });
 });
 
 // Display album create form on GET.

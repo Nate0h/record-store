@@ -1,0 +1,15 @@
+extends layout
+
+block content
+  h1 Title: #{title}
+
+  p #[strong Artist: ]
+    a(href=album.artist.url) #{album.artist.name}
+  p #[strong Summary:] #{album.summary}
+  p #[strong UPC:] #{album.upc}
+  p #[strong Genre: ]
+      |
+      a(href=album.genre.url) #{album.genre.name}
+      
+
+ 
