@@ -1,4 +1,5 @@
 const Artist = require("../models/artist");
+const Album = require("../models/album");
 const asyncHandler = require("express-async-handler");
 
 // Display list of all Authors.
@@ -10,9 +11,26 @@ exports.artist_list = asyncHandler(async (req, res, next) => {
   });
 });
 
-// Display detail page for a specific artist.
+// Display detail page for a specific Author.
 exports.artist_detail = asyncHandler(async (req, res, next) => {
-  res.send(`NOT IMPLEMENTED: artist detail: ${req.params.id}`);
+  // Get details of author and all their books (in parallel)
+  const [artist, allAlbumsByArtist] = await Promise.all([
+    Artist.findById(req.params.id).exec(),
+    Album.find({ artist: req.params.id }, "title summary").exec(),
+  ]);
+
+  if (artist === null) {
+    // No results.
+    const err = new Error("Artist not found");
+    err.status = 404;
+    return next(err);
+  }
+
+  res.render("artist_detail", {
+    title: "Artist Detail",
+    artist: artist,
+    artist_albums: allAlbumsByArtist,
+  });
 });
 
 // Display artist create form on GET.
