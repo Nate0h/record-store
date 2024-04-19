@@ -1,6 +1,7 @@
 const Artist = require("../models/artist");
 const Album = require("../models/album");
 const asyncHandler = require("express-async-handler");
+const { body, validationResult } = require("express-validator");
 
 // Display list of all Authors.
 exports.artist_list = asyncHandler(async (req, res, next) => {
@@ -33,15 +34,43 @@ exports.artist_detail = asyncHandler(async (req, res, next) => {
   });
 });
 
-// Display artist create form on GET.
-exports.artist_create_get = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: artist create GET");
-});
+exports.artist_create_get = (req, res, next) => {
+  res.render("artist_form", { title: "Create Artist" });
+};
 
-// Handle artist create on POST.
-exports.artist_create_post = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: artist create POST");
-});
+exports.artist_create_post = [
+  // Validate and sanitize fields.
+  body("name")
+    .trim()
+    .isLength({ min: 1 })
+    .escape()
+    .withMessage("Name must be specified."),
+
+  asyncHandler(async (req, res, next) => {
+    // Extract the validation errors from a request.
+    const errors = validationResult(req);
+
+    const artist = new Artist({
+      name: req.body.name,
+    });
+
+    if (!errors.isEmpty()) {
+      // There are errors. Render form again with sanitized values/errors messages.
+      res.render("artist_form", {
+        title: "Create Artist",
+        artist: artist,
+        errors: errors.array(),
+      });
+      return;
+    } else {
+      // Data from form is valid.
+
+      await artist.save();
+
+      res.redirect(artist.url);
+    }
+  }),
+];
 
 // Display artist delete form on GET.
 exports.artist_delete_get = asyncHandler(async (req, res, next) => {
