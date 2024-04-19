@@ -128,14 +128,43 @@ exports.album_create_post = [
 
 // Display album delete form on GET.
 exports.album_delete_get = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: album delete GET");
+  // Get details of books, book instances for specific book
+  const album = await Album.findById(req.params.id)
+    .populate("artist")
+    .populate("genre")
+    .exec();
+
+  if (album === null) {
+    res.redirect("/catalog/albums");
+  }
+
+  res.render("album_delete", {
+    title: album.title,
+    album: album,
+  });
 });
 
 // Handle album delete on POST.
 exports.album_delete_post = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: album delete POST");
-});
+  // Get details of author and all their books (in parallel)
+  const album = await Album.findById(req.params.id)
+    .populate("artist")
+    .populate("genre")
+    .exec();
 
+  if (album === null) {
+    // Author has books. Render in same way as for GET route.
+    res.render("album_delete", {
+      title: "Delete Album",
+      album: album,
+    });
+    return;
+  } else {
+    // Author has no books. Delete object and redirect to the list of authors.
+    await Album.findByIdAndDelete(req.body.albumid);
+    res.redirect("/catalog/albums");
+  }
+});
 // Display album update form on GET.
 exports.album_update_get = asyncHandler(async (req, res, next) => {
   res.send("NOT IMPLEMENTED: album update GET");
