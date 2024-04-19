@@ -39,6 +39,7 @@ exports.artist_create_get = (req, res, next) => {
 };
 
 exports.artist_create_post = [
+  upload.single("image"),
   // Validate and sanitize fields.
   body("name")
     .trim()
@@ -52,6 +53,7 @@ exports.artist_create_post = [
 
     const artist = new Artist({
       name: req.body.name,
+      image: req.file ? req.file.filename : null,
     });
 
     if (!errors.isEmpty()) {
@@ -123,6 +125,7 @@ exports.artist_update_get = asyncHandler(async (req, res, next) => {
 
 // Handle artist update on POST.
 exports.artist_update_post = [
+  upload.single("image"),
   // Validate and sanitize fields.
   body("name")
     .trim()
@@ -136,6 +139,7 @@ exports.artist_update_post = [
 
     const artist = new Artist({
       name: req.body.name,
+      image: req.file ? req.file.filename : null,
       _id: req.params.id,
     });
 
