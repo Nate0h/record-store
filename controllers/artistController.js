@@ -117,10 +117,45 @@ exports.artist_delete_post = asyncHandler(async (req, res, next) => {
 
 // Display artist update form on GET.
 exports.artist_update_get = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: artist update GET");
+  const artist = await Artist.findById(req.params.id).exec();
+  res.render("artist_form", { title: "Create Artist", artist: artist });
 });
 
 // Handle artist update on POST.
-exports.artist_update_post = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: artist update POST");
-});
+exports.artist_update_post = [
+  // Validate and sanitize fields.
+  body("name")
+    .trim()
+    .isLength({ min: 1 })
+    .escape()
+    .withMessage("Name must be specified."),
+
+  asyncHandler(async (req, res, next) => {
+    // Extract the validation errors from a request.
+    const errors = validationResult(req);
+
+    const artist = new Artist({
+      name: req.body.name,
+      _id: req.params.id,
+    });
+
+    if (!errors.isEmpty()) {
+      // There are errors. Render form again with sanitized values/errors messages.
+      res.render("artist_form", {
+        title: "Update Artist",
+        artist: artist,
+        errors: errors.array(),
+      });
+      return;
+    } else {
+      // Data from form is valid.
+      const updatedArtist = await Artist.findByIdAndUpdate(
+        req.params.id,
+        artist,
+        {}
+      );
+
+      res.redirect(updatedArtist.url);
+    }
+  }),
+];
