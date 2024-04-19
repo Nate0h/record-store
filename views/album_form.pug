@@ -9,13 +9,13 @@ block content
       input#title.form-control(type='text', placeholder='Name of album' name='title' required value=(undefined===album ? '' : album.title) )
     div.form-group
       label(for='artist') Artist:
-      select#artist.form-control(name='artist' required)
+      select#artist.form-control(name='artist' required value=(undefined===album ? '' : album.genre ) )
         option(value='') --Please select an author--
         for artist in artists
             option(value=artist._id) #{artist.name}
     div.form-group
       label(for='summary') Summary:
-      textarea#summary.form-control(placeholder='Summary' name='summary' required value=(undefined===album ? '' : album.summary))
+      textarea#summary.form-control(placeholder='Summary' name='summary' required value=(undefined===album ? '' : album.summary ))
     div.form-group
       label(for='upc') UPC:
       input#isbn.form-control(type='number', placeholder='UPC number must be 12 digits' min=100000000000 max=999999999999 name='upc'  required)
@@ -27,6 +27,7 @@ block content
             option(value=genre._id) #{genre.name}
     
     button.btn.btn-primary(type='submit') Submit
+    a(href=album.url) Cancel
 
   if errors
     ul
