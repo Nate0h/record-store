@@ -167,10 +167,87 @@ exports.album_delete_post = asyncHandler(async (req, res, next) => {
 });
 // Display album update form on GET.
 exports.album_update_get = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: album update GET");
-});
+  // Get book, authors and genres for form.
+  const [album, allArtists, allGenres] = await Promise.all([
+    Album.findById(req.params.id).populate("artist").exec(),
+    Artist.find().sort({ family_name: 1 }).exec(),
+    Genre.find().sort({ name: 1 }).exec(),
+  ]);
 
-// Handle album update on POST.
-exports.album_update_post = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: album update POST");
+  if (album === null) {
+    // No results.
+    const err = new Error("Album not found");
+    err.status = 404;
+    return next(err);
+  }
+
+  res.render("album_form", {
+    title: "Update Album",
+    artists: allArtists,
+    genres: allGenres,
+    album: album,
+  });
 });
+// Handle album update on POST.
+exports.album_update_post = [
+  body("title", "Title must not be empty.")
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
+  body("artist", "Artist must not be empty.")
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
+  body("summary", "Summary must not be empty.")
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
+  body("upc", "UPC must not be 12 digits")
+    .trim()
+    .isNumeric()
+    .isInt({ min: 100000000000, max: 999999999999 })
+    .escape(),
+  body("genre").trim().isLength({ min: 1 }).escape(),
+  // Process request after validation and sanitization.
+  asyncHandler(async (req, res, next) => {
+    // Extract the validation errors from a request.
+    const errors = validationResult(req);
+
+    // Create a Book object with escaped/trimmed data and old id.
+    const album = new Album({
+      title: req.body.title,
+      artist: req.body.artist,
+      summary: req.body.summary,
+      upc: req.body.upc,
+      genre: req.body.genre,
+      _id: req.params.id, // This is required, or a new ID will be assigned!
+    });
+
+    if (!errors.isEmpty()) {
+      // There are errors. Render form again with sanitized values/error messages.
+
+      const [allArtists, allGenres] = await Promise.all([
+        Artist.find().sort({ family_name: 1 }).exec(),
+        Genre.find().sort({ name: 1 }).exec(),
+      ]);
+
+      res.render("album_form", {
+        title: "Update Book",
+        authors: allArtists,
+        genres: allGenres,
+        album: album,
+        errors: errors.array(),
+      });
+      return;
+    } else {
+      // Data from form is valid. Update the record.
+      const updatedAlbum = await Album.findByIdAndUpdate(
+        req.params.id,
+        album,
+        {}
+      );
+
+      res.redirect(updatedAlbum.url);
+    }
+  }),
+];
