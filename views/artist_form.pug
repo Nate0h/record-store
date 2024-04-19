@@ -3,10 +3,13 @@ extends layout
 block content
   h1=title
 
-  form(method='POST')
+  form(method='POST' enctype="mulitpart/form-data")
     div.form-group
       label(for='name') Name:
       input#first_name.form-control(type='text', placeholder='Madonna' name='name' required  )
+    div.form-group
+      label(for='image') Upload Image:
+      input#title.form-control(type='file' name='image' )
  
     button.btn.btn-primary(type='submit') Submit
     a(href=artist.url) Cancel
