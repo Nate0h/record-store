@@ -6,8 +6,11 @@ const AlbumSchema = new Schema({
   title: { type: String, required: true },
   artist: { type: Schema.Types.ObjectId, ref: "Artist", required: true },
   summary: { type: String, required: true },
-  upc: { type: Number, min: 100000000000, max: 999999999999, required: true },
   genre: { type: Schema.Types.ObjectId, ref: "Genre" },
+  upc: { type: Number, min: 100000000000, max: 999999999999, required: true },
+  price: { type: Number, required: true },
+  total_items: { Number, required: true },
+  image: { type: String },
 });
 
 // Virtual for book's URL

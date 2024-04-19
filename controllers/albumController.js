@@ -1,6 +1,8 @@
 const Album = require("../models/album");
 const Artist = require("../models/artist");
 const Genre = require("../models/genre");
+const multer = require("multer");
+const upload = multer({ dest: "./public/images/" });
 
 const asyncHandler = require("express-async-handler");
 const { body, validationResult } = require("express-validator");
@@ -67,6 +69,7 @@ exports.album_create_get = asyncHandler(async (req, res, next) => {
 
 // Handle book create on POST.
 exports.album_create_post = [
+  upload.single("image"),
   // Validate and sanitize fields.
   body("title", "Title must not be empty.")
     .trim()
@@ -86,6 +89,8 @@ exports.album_create_post = [
     .isInt({ min: 100000000000, max: 999999999999 })
     .escape(),
   body("genre").trim().isLength({ min: 1 }).escape(),
+  body("price", "Price must not be $0").isNumeric({ min: 1 }),
+  body("total_items", "Total Items must be greater than 0").isInt({ min: 1 }),
   // Process request after validation and sanitization.
 
   asyncHandler(async (req, res, next) => {
@@ -99,6 +104,9 @@ exports.album_create_post = [
       summary: req.body.summary,
       upc: req.body.upc,
       genre: req.body.genre,
+      price: req.body.price,
+      total_items: req.body.total_items,
+      image: req.file ? req.file.filename : null,
     });
 
     if (!errors.isEmpty()) {
@@ -190,6 +198,7 @@ exports.album_update_get = asyncHandler(async (req, res, next) => {
 });
 // Handle album update on POST.
 exports.album_update_post = [
+  upload.single("image"),
   body("title", "Title must not be empty.")
     .trim()
     .isLength({ min: 1 })
@@ -208,6 +217,8 @@ exports.album_update_post = [
     .isInt({ min: 100000000000, max: 999999999999 })
     .escape(),
   body("genre").trim().isLength({ min: 1 }).escape(),
+  body("price", "Price must not be $0").isNumeric({ min: 1 }),
+  body("total_items", "Total Items must be greater than 0").isInt({ min: 1 }),
   // Process request after validation and sanitization.
   asyncHandler(async (req, res, next) => {
     // Extract the validation errors from a request.
@@ -220,6 +231,9 @@ exports.album_update_post = [
       summary: req.body.summary,
       upc: req.body.upc,
       genre: req.body.genre,
+      price: req.body.price,
+      total_items: req.body.total_items,
+      image: req.file ? req.file.filename : null,
       _id: req.params.id, // This is required, or a new ID will be assigned!
     });
 
