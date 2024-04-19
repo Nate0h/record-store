@@ -72,14 +72,47 @@ exports.artist_create_post = [
   }),
 ];
 
-// Display artist delete form on GET.
+// Display Artist delete form on GET.
 exports.artist_delete_get = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: artist delete GET");
+  // Get details of author and all their books (in parallel)
+  const [artist, allAlbumsByArtist] = await Promise.all([
+    Artist.findById(req.params.id).exec(),
+    Album.find({ artist: req.params.id }, "title summary").exec(),
+  ]);
+
+  if (artist === null) {
+    // No results.
+    res.redirect("/catalog/artists");
+  }
+
+  res.render("artist_delete", {
+    title: "Delete Artist",
+    artist: artist,
+    artist_albums: allAlbumsByArtist,
+  });
 });
 
-// Handle artist delete on POST.
+// Handle Artist delete on POST.
 exports.artist_delete_post = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: artist delete POST");
+  // Get details of author and all their books (in parallel)
+  const [artist, allAlbumsByArtist] = await Promise.all([
+    Artist.findById(req.params.id).exec(),
+    Album.find({ artist: req.params.id }, "title summary").exec(),
+  ]);
+
+  if (allAlbumsByArtist.length > 0) {
+    // Author has books. Render in same way as for GET route.
+    res.render("artist_delete", {
+      title: "Delete Artist",
+      artist: artist,
+      artist_albums: allAlbumsByArtist,
+    });
+    return;
+  } else {
+    // Author has no books. Delete object and redirect to the list of authors.
+    await Artist.findByIdAndDelete(req.body.artistid);
+    res.redirect("/catalog/artists");
+  }
 });
 
 // Display artist update form on GET.
