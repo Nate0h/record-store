@@ -3,7 +3,7 @@ extends layout
 block content
   h1= title
 
-  form(method='POST' enctype="mulitpart/form-data")
+  form(method='POST' enctype="multipart/form-data")
     div.form-group
       label(for='title') Title:
       input#title.form-control(type='text', placeholder='Name of album' name='title' required value=(undefined===album ? '' : album.title) )
@@ -23,19 +23,16 @@ block content
         for genre in genres
             option(value=genre._id) #{genre.name}
     div.form-group
-      label(for='upc') UPC Number:
-      input#isbn.form-control(type='number', placeholder='UPC number must be 12 digits' min=100000000000 max=999999999999 name='upc'  required)
-    div.form-group
       label(for='price') Price:
-      input#isbn.form-control(type='number', placeholder='123' min=1 name='price'  required)
+      input#isbn.form-control(type='number', placeholder='Enter whole number e.g 12' min=1 name='price'  required)
     div.form-group
       label(for='total_items') Total Items:
-      input#isbn.form-control(type='number', placeholder='123' min=1 name='total_items'  required)
+      input#isbn.form-control(type='number', placeholder='12' min=1 name='total_items'  required)
     div.form-group
       label(for='image') Upload Image:
       input#title.form-control(type='file' name='image' )
     button.btn.btn-primary(type='submit') Submit
-    a(href=album.url) Cancel
+    a(href="/catalog/albums") Cancel
 
   if errors
     ul

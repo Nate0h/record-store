@@ -3,15 +3,14 @@ extends layout
 block content
   h1 Title: #{title}
 
-  div.detail_image(src=`/images/${album.image}`)
+  img.detail_image(src=`/images/${album.image}`)
   p #[strong Artist: ]
     a(href=album.artist.url) #{album.artist.name}
   p #[strong Summary:] #{album.summary}
   p #[strong Genre: ]
       |
       a(href=album.genre.url) #{album.genre.name}
-  p #[strong UPC:] #{album.upc}
-  p #[strong Price:] $#{album.upc}
+  p #[strong Price:] $#{album.price}.00
   p #[strong #{album.total_items}] Items 
 
       

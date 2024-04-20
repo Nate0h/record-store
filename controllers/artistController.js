@@ -2,6 +2,8 @@ const Artist = require("../models/artist");
 const Album = require("../models/album");
 const asyncHandler = require("express-async-handler");
 const { body, validationResult } = require("express-validator");
+const multer = require("multer");
+const upload = multer({ dest: "./public/images/" });
 
 // Display list of all Authors.
 exports.artist_list = asyncHandler(async (req, res, next) => {

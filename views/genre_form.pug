@@ -11,7 +11,7 @@ block content
       label(for='description') Description:
       input#name.form-control(type='text', placeholder='Genre description' name='description' required value=(undefined===genre ? '' : genre.description) )
     button.btn.btn-primary(type='submit') Submit
-    a(href=genre.url) Cancel
+    a(href="/catalog/genres") Cancel
 
   if errors
     ul

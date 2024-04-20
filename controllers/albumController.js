@@ -2,7 +2,18 @@ const Album = require("../models/album");
 const Artist = require("../models/artist");
 const Genre = require("../models/genre");
 const multer = require("multer");
-const upload = multer({ dest: "./public/images/" });
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "public/images/");
+  },
+  filename: function (req, file, cb) {
+    if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+      return cb(new Error("Please upload a valid image file"));
+    }
+    cb(null, file.originalname);
+  },
+});
+const upload = multer({ storage: storage });
 
 const asyncHandler = require("express-async-handler");
 const { body, validationResult } = require("express-validator");
@@ -83,13 +94,8 @@ exports.album_create_post = [
     .trim()
     .isLength({ min: 1 })
     .escape(),
-  body("upc", "UPC must not be 12 digits")
-    .trim()
-    .isNumeric()
-    .isInt({ min: 100000000000, max: 999999999999 })
-    .escape(),
   body("genre").trim().isLength({ min: 1 }).escape(),
-  body("price", "Price must not be $0").isNumeric({ min: 1 }),
+  body("price", "Price must be greater be $0").isInt({ min: 1 }),
   body("total_items", "Total Items must be greater than 0").isInt({ min: 1 }),
   // Process request after validation and sanitization.
 
@@ -103,7 +109,6 @@ exports.album_create_post = [
       artist: req.body.artist,
       summary: req.body.summary,
       genre: req.body.genre,
-      upc: req.body.upc,
       price: req.body.price,
       total_items: req.body.total_items,
       image: req.file ? req.file.filename : null,
@@ -211,13 +216,8 @@ exports.album_update_post = [
     .trim()
     .isLength({ min: 1 })
     .escape(),
-  body("upc", "UPC must not be 12 digits")
-    .trim()
-    .isNumeric()
-    .isInt({ min: 100000000000, max: 999999999999 })
-    .escape(),
   body("genre").trim().isLength({ min: 1 }).escape(),
-  body("price", "Price must not be $0").isNumeric({ min: 1 }),
+  body("price", "Price must not be $0").isInt({ min: 1 }),
   body("total_items", "Total Items must be greater than 0").isInt({ min: 1 }),
   // Process request after validation and sanitization.
   asyncHandler(async (req, res, next) => {
@@ -230,7 +230,6 @@ exports.album_update_post = [
       artist: req.body.artist,
       summary: req.body.summary,
       genre: req.body.genre,
-      upc: req.body.upc,
       price: req.body.price,
       total_items: req.body.total_items,
       image: req.file ? req.file.filename : null,
