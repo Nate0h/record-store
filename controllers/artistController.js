@@ -3,7 +3,18 @@ const Album = require("../models/album");
 const asyncHandler = require("express-async-handler");
 const { body, validationResult } = require("express-validator");
 const multer = require("multer");
-const upload = multer({ dest: "./public/images/" });
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "public/images/");
+  },
+  filename: function (req, file, cb) {
+    if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+      return cb(new Error("Please upload a valid image file"));
+    }
+    cb(null, file.originalname);
+  },
+});
+const upload = multer({ storage: storage });
 
 // Display list of all Authors.
 exports.artist_list = asyncHandler(async (req, res, next) => {
