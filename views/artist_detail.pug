@@ -3,8 +3,9 @@ extends layout
 block content
 
   h1 Artist: #{artist.name}
-
-  img.detail_image(src=`/images/${artist.image}`)
+  
+  if artist.image != null
+    img.detail_image(src=`/images/${artist.image}`)
 
   div(style='margin-left:20px;margin-top:20px')
 

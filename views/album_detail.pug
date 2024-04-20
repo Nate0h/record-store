@@ -3,7 +3,9 @@ extends layout
 block content
   h1 Title: #{title}
 
-  img.detail_image(src=`/images/${album.image}`)
+  if album.image != null
+    img.detail_image(src=`/images/${album.image}`)
+  
   p #[strong Artist: ]
     a(href=album.artist.url) #{album.artist.name}
   p #[strong Summary:] #{album.summary}
@@ -11,9 +13,9 @@ block content
       |
       a(href=album.genre.url) #{album.genre.name}
   p #[strong Price:] $#{album.price}.00
-  p #[strong #{album.total_items}] Items 
+  p #[strong #{album.total_items} Items] 
 
-      
+  hr
   p
     a(href=album.url+'/delete') Delete album
   p
