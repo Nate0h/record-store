@@ -1,11 +1,15 @@
 // Import the mongoose module
 const mongoose = require("mongoose");
-
+const compression = require("compression");
+const helmet = require("helmet");
+const RateLimit = require("express-rate-limit");
 mongoose.set("strictQuery", false);
 
 // Define the database URL to connect to.
-const mongoDB =
+const dev_db_url =
   "mongodb+srv://Natecolon24:Mindovermatter24@cluster0.cd0dt4q.mongodb.net/record_store?retryWrites=true&w=majority&appName=Cluster0";
+
+const mongoDB = process.env.MONGODB_URI || dev_db_url;
 
 // Wait for database to connect, logging an error if there is a problem
 main().catch((err) => console.log(err));
@@ -34,6 +38,21 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+
+app.use(compression());
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      "script-src": ["'self'", "code.jquery.com", "cdn.jsdelivr.net"],
+    },
+  })
+);
+const limiter = RateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 20,
+});
+// Apply rate limiter to all requests
+app.use(limiter);
 
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
